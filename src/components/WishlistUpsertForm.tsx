@@ -6,16 +6,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { closeUpsertWishlistModal } from '../store/wishlistSlice';
 
 
-const WishlistAddForm = () => {
+const WishlistUpsertForm = () => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
   const isOpen = useSelector((state: RootState) => state.wishlists.upsertWishlistModalOpen);
-  const wishlist = useSelector((state: RootState) => state.wishlists.upsertWishlist)
+  const wishlist = useSelector((state: RootState) => state.wishlists.upsertWishlist);
   const { addWishlist, updateWishlist, fetchWishlists } = useFirestore();
   const [title, setTitle] = useState('');
   const [comment, setComment] = useState('');
   const [icon, setIcon] = useState('');
   const [type, setType] = useState<TWishlist['type']>("private");
+  const [isNewModel, setIsNewModel] = useState<boolean>(false);
 
   useEffect(() => {
     if (wishlist) {
@@ -23,11 +24,13 @@ const WishlistAddForm = () => {
       setComment(wishlist.comment);
       setIcon(wishlist.icon);
       setType(wishlist.type);
+      setIsNewModel(false);
     } else {
       setTitle('');
       setComment('');
       setIcon('');
       setType('private');
+      setIsNewModel(true);
     }
   }, [wishlist]);
 
@@ -61,9 +64,8 @@ const WishlistAddForm = () => {
         updatedAt: (new Date()).toISOString(),
         items: [],
       });
-
-      fetchWishlists(user.uid!);
     }
+    fetchWishlists(user.uid!);
     
     setTitle('');
     setComment('');
@@ -86,7 +88,7 @@ const WishlistAddForm = () => {
         <div className="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg w-full mt-12">
           <form onSubmit={handleSubmit} className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-              Create New Wishlist
+              {isNewModel ? 'Create New Wishlist' : 'Edit Wishlist'}
             </h3>
 
             <div className="mt-4">
@@ -150,7 +152,7 @@ const WishlistAddForm = () => {
                 type="submit"
                 className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-span-2 sm:w-auto"
               >
-                Create
+                {isNewModel ? 'Create' : 'Update'}
               </button>
               <button
                 onClick={onClose}
@@ -167,4 +169,4 @@ const WishlistAddForm = () => {
   );
 };
 
-export default WishlistAddForm;
+export default WishlistUpsertForm;

@@ -8,6 +8,27 @@ interface WishlistHeadProps {
   showItems?: boolean;
 }
 
+export const WishlistTypeBadge = ({ type }: { type: TWishlist['type'] }) => {
+  const classes: Record<TWishlist['type'], string> = {
+    private: 'bg-red-200 text-red-800',
+    public: 'bg-green-200 text-green-800',
+    shared: 'bg-yellow-200 text-yellow-800',
+    secret: 'bg-blue-200 text-blue-800',
+  };
+  const texts: Record<TWishlist['type'], string> = {
+    private: 'Private',
+    public: 'Public',
+    shared: 'Shared',
+    secret: 'Secret',
+  };
+
+  return (
+    <small className={`mt-4 mr-2 px-2 py-1 rounded-lg ${classes[type]}`}>
+              {texts[type]}
+            </small>
+  );
+};
+
 const WishlistHead = ({ wishlist, showItems = true }: WishlistHeadProps) => {
   const dispatch = useDispatch();
 
@@ -26,17 +47,17 @@ const WishlistHead = ({ wishlist, showItems = true }: WishlistHeadProps) => {
             <p className='text-xl font-bold'>{wishlist.title}</p>
             <p>{wishlist.comment}</p>
           </div>
-          <div>
-            <small className={`mt-4 mr-2 px-2 py-1 rounded-lg ${wishlist.type === 'public' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
-              {wishlist.type === 'public' ? 'Public' : 'Private'}
-            </small>
+          <div className='self-center'>
+            <WishlistTypeBadge type={wishlist.type} />
           </div>
-          <div
-            className='p-4 rounded-xl ml-4 w-6 box-content text-center text-gray-600 hover:text-gray-800 cursor-pointer hover:bg-slate-400'
-            onClick={() => dispatch(openUpsertWishlistModal(wishlist))}
-          >
-            <i className="fa-xl fa-solid fa-pen"></i>
-          </div>
+          {showItems && (
+            <div
+              className='p-4 rounded-xl ml-4 w-6 box-content text-center text-gray-600 hover:text-gray-800 cursor-pointer hover:bg-slate-400'
+              onClick={() => dispatch(openUpsertWishlistModal(wishlist))}
+            >
+              <i className="fa-xl fa-solid fa-pen"></i>
+            </div>
+          )}
         </div>
         {showItems && (
           <div className='grid grid-cols-1 gap-2 m-2'>

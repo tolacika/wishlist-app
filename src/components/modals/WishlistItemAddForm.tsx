@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TWishlist } from "../types/Wishlist";
+import { TWishlist } from "../../types/Wishlist";
 import { useDispatch } from "react-redux";
 
 

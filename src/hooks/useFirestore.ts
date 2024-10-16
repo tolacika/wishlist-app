@@ -3,11 +3,14 @@ import { db } from '../firebase/config';
 import { setWishlists, setLoading } from '../store/wishlistSlice';
 import { useDispatch } from 'react-redux';
 import { TWishlist } from '../types/Wishlist';
+//import useSecrets from './useSecrets';
+//import CryptoJs from 'crypto-js';
 
 const wishlistConverter = {
   toFirestore(wishlist: TWishlist): DocumentData {
     return {
       //id: wishlist.id ?? null,
+      //iv: wishlist.iv ?? null,
       uid: wishlist.uid,
       title: wishlist.title,
       comment: wishlist.comment,
@@ -30,6 +33,7 @@ const wishlistConverter = {
     const data = snapshot.data(options);
     return {
       id: snapshot.id,
+      //iv: data.iv,
       uid: data.uid,
       title: data.title,
       comment: data.comment,
@@ -52,6 +56,18 @@ const wishlistConverter = {
 
 export const useFirestore = () => {
   const dispatch = useDispatch();
+  /*const {getSecret} = useSecrets();
+
+  const getIv = (iv?: string): CryptoJs.lib.WordArray => iv ? CryptoJs.enc.Hex.parse(iv) : CryptoJs.lib.WordArray.random(16);
+
+  const encryptData = (data: string | object, secret: string, iv: CryptoJs.lib.WordArray) => {
+    return CryptoJs.AES.encrypt(JSON.stringify(data), secret, { iv }).toString();
+  }
+
+  const decryptData = (encryptedData: string, secret: string, iv: CryptoJs.lib.WordArray) => {
+    const bytes = CryptoJs.AES.decrypt(encryptedData, secret, { iv });
+    return JSON.parse(bytes.toString(CryptoJs.enc.Utf8));
+  }*/
 
   const fetchWishlists = async (uid: string | null) => {
     if (!uid) {
@@ -68,9 +84,23 @@ export const useFirestore = () => {
       const userWishlists = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      }));
+      }))
+        /*.map(doc => {
+          if (doc.type === 'secret') {
+            const secret = getSecret(doc.id);
+            const iv = getIv(doc.iv);
+            if (secret && iv) {
+              return {
+                ...doc,
+                title: decryptData(doc.title, secret, iv),
+                comment: decryptData(doc.comment, secret, iv),
+              };
+            }
+          }
+          return doc;
+        })*/;
 
-      console.log(userWishlists);
+      
       dispatch(setWishlists(userWishlists as TWishlist[]));
     } catch (error) {
       console.error("Error fetching user's wishlists: ", error);
@@ -90,6 +120,16 @@ export const useFirestore = () => {
 
   const updateWishlist = async (wishlist: TWishlist): Promise<TWishlist['id']> => {
     const {id, ...data} = wishlist;
+
+    /*if (wishlist.type === 'secret') {
+      const secret = getSecret(wishlist.id!);
+      const iv = getIv(wishlist.iv);
+      if (secret) {
+        data.iv = iv.toString(CryptoJs.enc.Hex);
+        data.title = encryptData(data.title, wishlist.id!, iv);
+        data.comment = encryptData(data.comment, wishlist.id!, iv);
+      }
+    }*/
 
     const wishlistsRef = doc(db, 'wishlists', id!).withConverter(wishlistConverter);
 

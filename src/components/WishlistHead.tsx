@@ -8,24 +8,26 @@ interface WishlistHeadProps {
   showItems?: boolean;
 }
 
-export const WishlistTypeBadge = ({ type }: { type: TWishlist['type'] }) => {
-  const classes: Record<TWishlist['type'], string> = {
-    private: 'bg-red-200 text-red-800',
-    public: 'bg-green-200 text-green-800',
-    shared: 'bg-yellow-200 text-yellow-800',
-    secret: 'bg-blue-200 text-blue-800',
-  };
-  const texts: Record<TWishlist['type'], string> = {
-    private: 'Private',
-    public: 'Public',
-    shared: 'Shared',
-    secret: 'Secret',
-  };
+const classes: Record<TWishlist['type'], string> = {
+  private: 'bg-red-200 text-red-800',
+  public: 'bg-green-200 text-green-800',
+  shared: 'bg-yellow-200 text-yellow-800',
+  secret: 'bg-blue-200 text-blue-800',
+};
 
+export const wishlistTypes: Record<TWishlist['type'], string> = {
+  private: 'Private',
+  public: 'Public',
+  shared: 'Shared',
+  secret: 'Secret',
+};
+
+
+export const WishlistTypeBadge = ({ type }: { type: TWishlist['type'] }) => {
   return (
     <small className={`mt-4 mr-2 px-2 py-1 rounded-lg ${classes[type]}`}>
-              {texts[type]}
-            </small>
+      {wishlistTypes[type]}
+    </small>
   );
 };
 

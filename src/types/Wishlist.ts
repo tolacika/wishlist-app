@@ -14,6 +14,7 @@ export type TWishlistItem = {
 
 export type TWishlist = {
   id?: string;
+  //iv?: string;
   uid?: string;
   type: 'public' | 'private' | 'shared' | 'secret';
   title: string;

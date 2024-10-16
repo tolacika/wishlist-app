@@ -11,12 +11,12 @@ interface MessageProps {
 const Message = ({ children, type = "info" }: MessageProps) => {
   return (
     
-    <div className={`p-4 rounded-lg shadow-lg mt-16 mb-4 mx-4 flex items-center justify-between cursor-pointer ${
+    <div className={`p-4 rounded-lg shadow-lg mt-16 mb-4 mx-4 flex items-center justify-between ${
       type === 'success'
-        ? 'bg-green-200 hover:bg-green-300'
+        ? 'bg-green-200'
         : type === 'error'
-        ? 'bg-red-200 hover:bg-red-300'
-        : 'bg-blue-200 hover:bg-blue-300'
+        ? 'bg-red-200'
+        : 'bg-blue-200'
     }`}>
       <i className={`mr-2 fa-xl fa-solid fa-${
         type === 'success'

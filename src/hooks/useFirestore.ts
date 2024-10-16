@@ -1,11 +1,11 @@
-import { addDoc, collection, DocumentData, getDocs, query, Timestamp, where } from 'firebase/firestore';
+import { addDoc, collection, doc, DocumentData, getDocs, query, setDoc, Timestamp,  where } from 'firebase/firestore';
 import { db } from '../firebase/config'; 
 import { setWishlists, setLoading } from '../store/wishlistSlice';
 import { useDispatch } from 'react-redux';
-import { Wishlist } from '../types/Wishlist';
+import { TWishlist } from '../types/Wishlist';
 
 const wishlistConverter = {
-  toFirestore(wishlist: Wishlist): DocumentData {
+  toFirestore(wishlist: TWishlist): DocumentData {
     return {
       //id: wishlist.id ?? null,
       uid: wishlist.uid,
@@ -26,7 +26,7 @@ const wishlistConverter = {
       })),
     };
   },
-  fromFirestore(snapshot: any, options: any): Wishlist {
+  fromFirestore(snapshot: any, options: any): TWishlist {
     const data = snapshot.data(options);
     return {
       id: snapshot.id,
@@ -62,7 +62,7 @@ export const useFirestore = () => {
     dispatch(setLoading(true));
 
     try {
-      const wishlistsRef = collection(db, 'wishlists').withConverter(wishlistConverter);;
+      const wishlistsRef = collection(db, 'wishlists').withConverter(wishlistConverter);
       const q = query(wishlistsRef, where('uid', '==', uid));
       const querySnapshot = await getDocs(q);
       const userWishlists = querySnapshot.docs.map((doc) => ({
@@ -71,7 +71,7 @@ export const useFirestore = () => {
       }));
 
       console.log(userWishlists);
-      dispatch(setWishlists(userWishlists as Wishlist[]));
+      dispatch(setWishlists(userWishlists as TWishlist[]));
     } catch (error) {
       console.error("Error fetching user's wishlists: ", error);
     } finally {
@@ -80,14 +80,23 @@ export const useFirestore = () => {
 
   };
 
-  const addWishlist = async (data: Wishlist): Promise<Wishlist['id']> => {
+  const addWishlist = async (data: TWishlist): Promise<TWishlist['id']> => {
     const wishlistsRef = collection(db, 'wishlists').withConverter(wishlistConverter);
-    console.log(data, wishlistConverter.toFirestore(data));
+
     const newDoc = await addDoc(wishlistsRef, data);
+
     return newDoc.id;
   };
 
+  const updateWishlist = async (wishlist: TWishlist): Promise<TWishlist['id']> => {
+    const {id, ...data} = wishlist;
+
+    const wishlistsRef = doc(db, 'wishlists', id!).withConverter(wishlistConverter);
+
+    await setDoc(wishlistsRef, data)
+
+    return id;
+  };
   
-  
-  return { fetchWishlists, addWishlist };
+  return { fetchWishlists, addWishlist, updateWishlist };
 };

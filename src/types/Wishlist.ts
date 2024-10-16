@@ -1,47 +1,25 @@
-/*export type WishlistItem = {
-  name: string;
-  description: string;
-  imageUrl: string;
-  links: string[];
-  position: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export type Wishlist = {
-  id?: string;
-  uid?: string
-  title: string;
-  comment: string;
-  icon: string;
-  type: 'public' | 'private';
-  createdAt: Date;
-  updatedAt: Date;
-  items: Array<WishlistItem>;
-}*/
-
-export interface Link {
+export type TLink = {
   url: string;
 }
 
-export interface WishlistItem {
+export type TWishlistItem = {
   name: string;
   description: string;
   imageUrl: string;
-  links: Link[];
+  links: TLink[];
   position: number;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface Wishlist {
+export type TWishlist = {
   id?: string;
   uid?: string;
-  type: 'public' | 'private';
+  type: 'public' | 'private' | 'shared' | 'secret';
   title: string;
   comment: string;
   icon: string;
   createdAt: string;
   updatedAt: string;
-  items: WishlistItem[];
+  items: TWishlistItem[];
 }

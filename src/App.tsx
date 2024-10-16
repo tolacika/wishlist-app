@@ -1,21 +1,18 @@
-import WishlistHead from './components/WishlistHead';
 import Header from './components/Header';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from './store';
 import { useAuth } from './hooks/useAuth';
 import { useEffect, useState } from 'react';
 import { useFirestore } from './hooks/useFirestore';
-import WishlistAddForm from './components/WishlistForm';
-import { setSelectedWishlistId } from './store/wishlistSlice';
+import WishlistAddForm from './components/WishlistAddForm';
 import Message from './components/Message';
+import WishlistItemAddForm from './components/WishlistItemAddForm';
+import WishlistWrapper from './components/WishlistWrapper';
 
 
 const App = () => {
-  const dispatch = useDispatch();
-  
   const user = useSelector((state: RootState) => state.user);
-  const selectedWishlistId = useSelector((state: RootState) => state.wishlists.selectedWishlistId);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isItemModalOpen, setIsItemModalOpen] = useState<boolean>(false);
 
   const { handleLogin, handleLogout } = useAuth();
   const { fetchWishlists } = useFirestore();
@@ -23,36 +20,28 @@ const App = () => {
 
   useEffect(() => {
     fetchWishlists(user.uid ?? null);
-  }, [fetchWishlists, user]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
-  const handleCreateWishlist = () => {
-    setIsModalOpen(true);
-  };
 
-  const handleWishlistClick = (id: string) => {
-    dispatch(setSelectedWishlistId(id))
-  };
 
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col">
       <Header
         handleLogin={handleLogin}
         handleLogout={handleLogout}
-        handleCreateWishlist={handleCreateWishlist}
-        handleWishlistClick={handleWishlistClick}
       />
 
       <main className="flex-grow container mx-auto">
         {user.uid ? (
           <>
-            <WishlistAddForm
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
+            <WishlistAddForm />
+            <WishlistItemAddForm
+              isOpen={isItemModalOpen}
+              onClose={() => setIsItemModalOpen(false)}
             />
             {/* <h2 className="text-3xl font-bold mb-6 px-4">Welcome, {user.displayName}!</h2> */}
-            <WishlistHead
-              selectedWishlistId={selectedWishlistId ?? null}
-            />
+            <WishlistWrapper />
           </>
         ) : <Message>Please log in to manage your wishlists.</Message>}
       </main>

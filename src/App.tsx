@@ -4,9 +4,9 @@ import { RootState } from './store';
 import { useAuth } from './hooks/useAuth';
 import { useEffect, useState } from 'react';
 import { useFirestore } from './hooks/useFirestore';
-import WishlistAddForm from './components/WishlistAddForm';
+import WishlistUpsertForm from './components/modals/WishlistUpsertForm';
 import Message from './components/Message';
-import WishlistItemAddForm from './components/WishlistItemAddForm';
+import WishlistItemAddForm from './components/modals/WishlistItemAddForm';
 import WishlistWrapper from './components/WishlistWrapper';
 
 
@@ -35,7 +35,7 @@ const App = () => {
       <main className="flex-grow container mx-auto">
         {user.uid ? (
           <>
-            <WishlistAddForm />
+            <WishlistUpsertForm />
             <WishlistItemAddForm
               isOpen={isItemModalOpen}
               onClose={() => setIsItemModalOpen(false)}

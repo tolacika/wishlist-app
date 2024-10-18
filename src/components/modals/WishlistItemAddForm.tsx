@@ -1,75 +1,25 @@
-import { useEffect, useState } from 'react';
-import { TWishlist } from '../types/Wishlist';
-import { useFirestore } from '../hooks/useFirestore';
-import { RootState } from '../store';
-import { useDispatch, useSelector } from 'react-redux';
-import { closeUpsertWishlistModal } from '../store/wishlistSlice';
+import { useState } from "react";
+import { TWishlist } from "../../types/Wishlist";
+import { useDispatch } from "react-redux";
 
 
-const WishlistAddForm = () => {
+interface WishlistItemAddFormProps {
+  isOpen?: boolean;
+  onClose(): void;
+  onSubmit?(newId: TWishlist['id']): void;
+}
+
+
+const WishlistItemAddForm = ({isOpen, onClose, onSubmit}: WishlistItemAddFormProps) => {
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.user);
-  const isOpen = useSelector((state: RootState) => state.wishlists.upsertWishlistModalOpen);
-  const wishlist = useSelector((state: RootState) => state.wishlists.upsertWishlist)
-  const { addWishlist, updateWishlist, fetchWishlists } = useFirestore();
-  const [title, setTitle] = useState('');
-  const [comment, setComment] = useState('');
-  const [icon, setIcon] = useState('');
-  const [type, setType] = useState<TWishlist['type']>("private");
+  const [name, setName] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [url, setUrl] = useState<string>('');
+  const [links, setLinks] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (wishlist) {
-      setTitle(wishlist.title);
-      setComment(wishlist.comment);
-      setIcon(wishlist.icon);
-      setType(wishlist.type);
-    } else {
-      setTitle('');
-      setComment('');
-      setIcon('');
-      setType('private');
-    }
-  }, [wishlist]);
-
-  const onClose = () => {
-    dispatch(closeUpsertWishlistModal());
-  }
-
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
-
-    if (wishlist) {
-      await updateWishlist({
-        id: wishlist.id,
-        uid: wishlist.uid,
-        title,
-        comment,
-        icon,
-        type,
-        createdAt: wishlist.createdAt,
-        updatedAt: (new Date()).toISOString(),
-        items: wishlist.items,
-      });
-    } else {
-      await addWishlist({
-        uid: user.uid!,
-        title,
-        comment,
-        icon,
-        type,
-        createdAt: (new Date()).toISOString(),
-        updatedAt: (new Date()).toISOString(),
-        items: [],
-      });
-
-      fetchWishlists(user.uid!);
-    }
-    
-    setTitle('');
-    setComment('');
-    setIcon('');
-    setType('private');
-    onClose();
   };
 
   return (
@@ -97,8 +47,8 @@ const WishlistAddForm = () => {
                 type="text"
                 name="title"
                 id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full p-2 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -109,41 +59,24 @@ const WishlistAddForm = () => {
               <textarea
                 id="comment"
                 name="comment"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 rows={2}
                 className="w-full p-2 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="mt-4">
               <label htmlFor="icon" className="block text-md font-medium text-gray-700">
-                Icon (URL or Emoji)
+                Image URL
               </label>
               <input
                 type="text"
                 name="icon"
                 id="icon"
-                value={icon}
-                onChange={(e) => setIcon(e.target.value)}
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
                 className="w-full p-2 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
-            <div className="mt-4">
-              <label htmlFor="type" className="block text-md font-medium text-gray-700">
-                Type
-              </label>
-              <select
-                id="type"
-                name="type"
-                value={type}
-                onChange={(e) => setType(e.target.value as TWishlist['type'])}
-                className="w-full p-2 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="private">Private</option>
-                <option value="public">Public</option>
-                <option value="shared">Shared</option>
-                <option value="secret">Secret</option>
-              </select>
             </div>
             <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
               <button
@@ -167,4 +100,4 @@ const WishlistAddForm = () => {
   );
 };
 
-export default WishlistAddForm;
+export default WishlistItemAddForm

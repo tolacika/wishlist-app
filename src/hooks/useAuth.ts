@@ -3,9 +3,11 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { auth, provider } from "../firebase/config";
 import { clearUser, setUser } from "../store/userSlice";
+//import useSecrets from "./useSecrets";
 
 export const useAuth = () => {
   const dispatch = useDispatch();
+  //const {resetSecrets} = useSecrets();
 
   useEffect(() => {
     onAuthStateChanged(auth, (user: any) => {
@@ -29,6 +31,7 @@ export const useAuth = () => {
   };
 
   const handleLogout = async () => {
+    //resetSecrets();
     await signOut(auth);
   };
 

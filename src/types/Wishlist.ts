@@ -12,14 +12,23 @@ export type TWishlistItem = {
   updatedAt: string;
 }
 
-export type TWishlist = {
-  id?: string;
-  uid?: string;
-  type: 'public' | 'private' | 'shared' | 'secret';
+export type TWishlistData = {
   title: string;
   comment: string;
-  icon: string;
-  createdAt: string;
-  updatedAt: string;
   items: TWishlistItem[];
 }
+
+export type TWishlist = {
+  id?: string;
+  nonce?: string;
+  uid?: string;
+  type: 'public' | 'private' | 'shared' | 'secret';
+  icon: string;
+  data: TWishlistData;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type TEncryptedWishlist = Omit<TWishlist, 'data'> & {
+  data: string;
+};

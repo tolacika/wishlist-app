@@ -46,8 +46,8 @@ const WishlistHead = ({ wishlist, showItems = true }: WishlistHeadProps) => {
             </div>
           </div>
           <div className='flex-grow'>
-            <p className='text-xl font-bold'>{wishlist.title}</p>
-            <p>{wishlist.comment}</p>
+            <p className='text-xl font-bold'>{wishlist.data.title}</p>
+            <p>{wishlist.data.comment}</p>
           </div>
           <div className='self-center'>
             <WishlistTypeBadge type={wishlist.type} />
@@ -63,7 +63,7 @@ const WishlistHead = ({ wishlist, showItems = true }: WishlistHeadProps) => {
         </div>
         {showItems && (
           <div className='grid grid-cols-1 gap-2 m-2'>
-            {wishlist.items.map((item: TWishlistItem, index: number) => (
+            {wishlist.data.items.map((item: TWishlistItem, index: number) => (
               <WishlistItem key={index} wishlistItem={item} />
             ))}
             <div

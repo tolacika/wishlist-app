@@ -7,7 +7,7 @@ import { closeUpsertWishlistModal } from '../../store/wishlistSlice';
 import Modal, { ModalButtons } from './Modal';
 import FormControl from '../FormControl';
 import { wishlistTypes } from '../WishlistHead';
-//import useSecrets from '../../hooks/useSecrets';
+import { setSecret, selectSecretById } from '../../store/secretsSlice';
 
 const WishlistUpsertForm = () => {
   const dispatch = useDispatch();
@@ -19,25 +19,27 @@ const WishlistUpsertForm = () => {
   const [comment, setComment] = useState('');
   const [icon, setIcon] = useState('');
   const [type, setType] = useState<TWishlist['type']>("private");
-  const [password, setPassword] = useState<string | null>(null);
   const [isNewModel, setIsNewModel] = useState<boolean>(false);
 
-  //const {setSecret, getSecret} = useSecrets();
+  const secret = useSelector((state: RootState) => selectSecretById(state, wishlist?.id ?? ""));
+
+  const handleSetSecret = (id: string, value: string) => {
+    dispatch(setSecret({ documentId: id, secret: value }));
+  }
+
 
   useEffect(() => {
     if (wishlist) {
-      setTitle(wishlist.title);
-      setComment(wishlist.comment);
+      setTitle(wishlist.data.title);
+      setComment(wishlist.data.comment);
       setIcon(wishlist.icon);
       setType(wishlist.type);
-      setPassword(null/*getSecret(wishlist.id!)*/);
       setIsNewModel(false);
     } else {
       setTitle('');
       setComment('');
       setIcon('');
       setType('private');
-      setPassword(null);
       setIsNewModel(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -51,35 +53,33 @@ const WishlistUpsertForm = () => {
     e.preventDefault();
 
     if (wishlist) {
-      /*if (type === 'secret') {
-        setSecret(wishlist.id!, password!);
-      }*/
       await updateWishlist({
         id: wishlist.id,
         uid: wishlist.uid,
-        title,
-        comment,
         icon,
         type,
         createdAt: wishlist.createdAt,
         updatedAt: (new Date()).toISOString(),
-        items: wishlist.items,
+        data: {
+          title,
+          comment,
+          items: wishlist.data.items,
+        }
       });
+      
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const newId = await addWishlist({
+      await addWishlist({
         uid: user.uid!,
-        title,
-        comment,
         icon,
         type,
         createdAt: (new Date()).toISOString(),
         updatedAt: (new Date()).toISOString(),
-        items: [],
+        data: {
+          title,
+          comment,
+          items: [],
+        }
       });
-      /*if (type === 'secret') {
-        setSecret(newId!, password!);
-      }*/
     }
     fetchWishlists(user.uid!);
 
@@ -87,7 +87,6 @@ const WishlistUpsertForm = () => {
     setComment('');
     setIcon('');
     setType('private');
-    setPassword(null);
     onClose();
   };
 
@@ -122,15 +121,15 @@ const WishlistUpsertForm = () => {
           label='Type'
           value={type}
           setValue={(v) => setType(v as TWishlist['type'])}
-          options={Object.entries(wishlistTypes).filter(([k]) => k !== 'secret').map(([k, v]) => ({ label: v, value: k}))}
+          options={Object.entries(wishlistTypes).filter(([k]) => !isNewModel || k !== 'secret').map(([k, v]) => ({ label: v, value: k}))}
           type='select'
         />
         {type === 'secret' && (
           <FormControl
             name='password'
             label='Password'
-            value={password || ''}
-            setValue={setPassword}
+            value={wishlist ? secret ?? '' : ''}
+            setValue={(v) => wishlist && handleSetSecret(wishlist.id!, v)}
             type='text'
           />
         )}

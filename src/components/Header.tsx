@@ -110,7 +110,7 @@ const Header = ({ handleLogin, handleLogout }: HeaderProps) => {
                         handleWishlistClick(wishlist.id);
                       }}
                     >
-                      {wishlist.title}
+                      {wishlist.data.title}
                     </button>
                   </li>
                 ))}
